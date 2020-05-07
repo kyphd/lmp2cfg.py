@@ -24,7 +24,7 @@ try:
         print("Now reading {}".format(inputfilename))
         flag = ""
         xyzcol = [0, 0, 0]
-        typecol = 0
+        typecol = None
         coodinatetype = ""
 
         for line in [s.strip() for s in inputfile.readlines()]:
@@ -57,9 +57,13 @@ try:
                     y = float(cols[xyzcol[1]])
                     z = float(cols[xyzcol[2]])
 
-                atoms.append([int(cols[typecol]), x, y, z])
-                if not int(cols[typecol]) in types:
-                    types.append(int(cols[typecol]))
+                if typecol == None:
+                    atoms.append([0, x, y, z])
+                else:
+                    atoms.append([int(cols[typecol]), x, y, z])
+
+                    if not int(cols[typecol]) in types:
+                        types.append(int(cols[typecol]))
 
             # set flag
             if line == "ITEM: NUMBER OF ATOMS":
@@ -69,21 +73,22 @@ try:
             elif line[0:11] == "ITEM: ATOMS":
                 flag = "atoms"
                 cols = line.split()
-                if "type" in cols and "x" in cols and "y" in cols and "z" in cols:
-                    typecol = cols.index("type") - 2
+                if "x" in cols and "y" in cols and "z" in cols:
                     xyzcol[0] = cols.index("x") - 2
                     xyzcol[1] = cols.index("y") - 2
                     xyzcol[2] = cols.index("z") - 2
                     coodinatetype = "unscaled"
-                elif "type" in cols and "xs" in cols and "ys" in cols and "zs" in cols:
-                    typecol = cols.index("type") - 2
+                elif "xs" in cols and "ys" in cols and "zs" in cols:
                     xyzcol[0] = cols.index("xs") - 2
                     xyzcol[1] = cols.index("ys") - 2
                     xyzcol[2] = cols.index("zs") - 2
                     coodinatetype = "scaled"
                 else:
-                    print("Error: lmt2cfg.py requires type and coordinate (x y z or xs ys zs) args in dump file.")
+                    print("Error: lmt2cfg.py requires coordinate (x y z or xs ys zs) args in dump file.")
                     sys.exit(1)
+
+                if "type" in cols:
+                    typecol = cols.index("type") - 2
 
 except Exception as e:
     print(e)
@@ -93,13 +98,21 @@ except Exception as e:
 types.sort()
 masses = {}
 elements = {}
-print("{} atom types are found. Input mass and element for each atom type.".format(len(types)))
-for atomtype in types:
-    print("For #{}".format(atomtype))
+if len(types) >= 1:
+    print("{} atom types are found. Input mass and element for each atom type.".format(len(types)))
+    for atomtype in types:
+        print("For #{}".format(atomtype))
+        print(" mass: ", end='')
+        masses[atomtype] = input()
+        print(" element: ", end='')
+        elements[atomtype] = input()
+
+else:
+    print("No type argument in dump file. All atoms are considered to be the same.")
     print(" mass: ", end='')
-    masses[atomtype] = input()
+    masses[0] = input()
     print(" element: ", end='')
-    elements[atomtype] = input()
+    elements[0] = input()
 
 # output cfg file
 try:

@@ -31,7 +31,7 @@ lmp2cfg.py ask you the necessary parameter after execution and you don't need to
 $ python lmp2cfg.py <dump file>
 ~~~
 
-Coordinate of each atom (\[x, y, z\] or \[xs, ys zs\]) and type arguments are required in dump file.
+Coordinate of each atom (\[x, y, z\] or \[xs, ys zs\] arguments) is required in dump file.
 
 Generally, "dump atom" command outputs all of them.
 
