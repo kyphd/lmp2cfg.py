@@ -26,6 +26,7 @@ try:
         xyzcol = [0, 0, 0]
         typecol = None
         coodinatetype = ""
+        minCell = [0,0,0]
 
         for line in [s.strip() for s in inputfile.readlines()]:
 
@@ -36,14 +37,17 @@ try:
 
             elif flag == "box-x":
                 cellSize[0] = float(line.split()[1]) - float(line.split()[0])
+                minCell[0] = float(line.split()[0])
                 flag = "box-y"
 
             elif flag == "box-y":
                 cellSize[1] = float(line.split()[1]) - float(line.split()[0])
+                minCell[1] = float(line.split()[0])
                 flag = "box-z"
 
             elif flag == "box-z":
                 cellSize[2] = float(line.split()[1]) - float(line.split()[0])
+                minCell[2] = float(line.split()[0])
                 flag = ""
 
             elif flag == "atoms":
@@ -57,8 +61,13 @@ try:
                     y = float(cols[xyzcol[1]])
                     z = float(cols[xyzcol[2]])
 
+                x -= minCell[0] / cellSize[0]
+                y -= minCell[1] / cellSize[1]
+                z -= minCell[2] / cellSize[2]
+
                 if typecol == None:
                     atoms.append([0, x, y, z])
+
                 else:
                     atoms.append([int(cols[typecol]), x, y, z])
 
